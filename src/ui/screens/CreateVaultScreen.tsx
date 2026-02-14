@@ -3,6 +3,7 @@ import {Text} from 'ink';
 import {TextInput} from '../components/TextInput.js';
 import {SelectList, SelectListItem} from '../components/SelectList.js';
 import {useAppState} from '../hooks/useAppState.js';
+import {useLocale} from '../hooks/useLocale.js';
 import {AlgorithmType} from '../../dto/algorithm.type.js';
 import {VaultCollection} from '../../dto/vault.dto.js';
 
@@ -26,6 +27,7 @@ const algorithmItems: SelectListItem[] = [
 
 export function CreateVaultScreen() {
     const {pop, replaceTop, vaultService, showNotification} = useAppState();
+    const {t} = useLocale();
 
     const [mode, setMode] = useState<EditMode>({type: 'navigate'});
     const [name, setName] = useState('');
@@ -46,15 +48,15 @@ export function CreateVaultScreen() {
     const nextInput = useCallback(() => setInputKey(prev => prev + 1), []);
 
     const collectionLabel = selectedCollection
-        ? (selectedCollection === rootCollection ? 'Корневая' : selectedCollection.collectionName)
-        : 'Корневая';
+        ? (selectedCollection === rootCollection ? t('create.root') : selectedCollection.collectionName)
+        : t('create.root');
 
     const validate = (): string | null => {
-        if (!name) return 'Имя хранилища обязательно';
+        if (!name) return t('create.nameRequired');
         if (!login && !password && !totpSecret && Object.keys(extraData).length === 0) {
-            return 'Заполните хотя бы одно поле данных (логин, пароль, TOTP или экстра)';
+            return t('create.dataRequired');
         }
-        if (!encryptPassword) return 'Пароль шифрования обязателен';
+        if (!encryptPassword) return t('create.encryptPasswordRequired');
         return null;
     };
 
@@ -75,12 +77,12 @@ export function CreateVaultScreen() {
             };
             const vault = {name, parentCollection};
             const savedVault = await vaultService.saveOrCreateVault(vault, vaultContent, algorithm, encryptPassword);
-            showNotification('Хранилище создано');
+            showNotification(t('create.created'));
             replaceTop({type: 'vault-detail', vault: savedVault, content: vaultContent});
         } catch (e) {
-            setMode({type: 'error', message: e instanceof Error ? e.message : 'Неизвестная ошибка'});
+            setMode({type: 'error', message: e instanceof Error ? e.message : t('create.unknownError')});
         }
-    }, [name, login, password, totpSecret, extraData, selectedCollection, rootCollection, algorithm, encryptPassword, vaultService, showNotification, replaceTop]);
+    }, [name, login, password, totpSecret, extraData, selectedCollection, rootCollection, algorithm, encryptPassword, vaultService, showNotification, replaceTop, t]);
 
     const collectCollections = (col: VaultCollection): SelectListItem[] => {
         const result: SelectListItem[] = [];
@@ -104,25 +106,27 @@ export function CreateVaultScreen() {
         return current;
     };
 
+    const ns = t('create.notSet');
+
     const formItems: SelectListItem[] = [
-        {label: `Имя: ${name || '(не задано)'}`, value: 'name'},
-        {label: `Логин: ${login || '(не задано)'}`, value: 'login'},
-        {label: `Пароль: ${password ? '********' : '(не задано)'}`, value: 'password'},
-        {label: `TOTP: ${totpSecret || '(не задано)'}`, value: 'totp'},
+        {label: `${t('create.fieldName')}: ${name || ns}`, value: 'name'},
+        {label: `${t('create.fieldLogin')}: ${login || ns}`, value: 'login'},
+        {label: `${t('create.fieldPassword')}: ${password ? '********' : ns}`, value: 'password'},
+        {label: `${t('create.fieldTotp')}: ${totpSecret || ns}`, value: 'totp'},
     ];
 
     for (const [key, val] of Object.entries(extraData)) {
         formItems.push({label: `  ✕ ${key}: ${val}`, value: `remove-extra:${key}`, color: 'yellow'});
     }
-    formItems.push({label: '+ Добавить экстра данные', value: 'add-extra'});
+    formItems.push({label: t('create.addExtra'), value: 'add-extra'});
 
     formItems.push({label: '─'.repeat(20), value: '', separator: true});
-    formItems.push({label: `Коллекция: 📁 ${collectionLabel}`, value: 'collection'});
-    formItems.push({label: `Алгоритм: ${algorithm}`, value: 'algorithm'});
-    formItems.push({label: `Пароль шифрования: ${encryptPassword ? '********' : '(не задано)'}`, value: 'encrypt-password'});
+    formItems.push({label: `${t('create.collection')}: 📁 ${collectionLabel}`, value: 'collection'});
+    formItems.push({label: `${t('create.algorithm')}: ${algorithm}`, value: 'algorithm'});
+    formItems.push({label: `${t('create.fieldEncryptPassword')}: ${encryptPassword ? '********' : ns}`, value: 'encrypt-password'});
     formItems.push({label: '─'.repeat(20), value: '', separator: true});
-    formItems.push({label: '✓ Создать', value: 'save', color: 'green'});
-    formItems.push({label: '← Назад (Esc)', value: 'back'});
+    formItems.push({label: t('create.save'), value: 'save', color: 'green'});
+    formItems.push({label: t('create.back'), value: 'back'});
 
     const handleFormSelect = useCallback((item: SelectListItem) => {
         switch (item.value) {
@@ -189,11 +193,11 @@ export function CreateVaultScreen() {
 
     const fieldPrompt = (field: string): string => {
         switch (field) {
-            case 'name': return 'Имя';
-            case 'login': return 'Логин';
-            case 'password': return 'Пароль';
-            case 'totp': return 'TOTP секрет';
-            case 'encrypt-password': return 'Пароль шифрования';
+            case 'name': return t('create.fieldName');
+            case 'login': return t('create.fieldLogin');
+            case 'password': return t('create.fieldPassword');
+            case 'totp': return t('create.fieldTotp');
+            case 'encrypt-password': return t('create.fieldEncryptPassword');
             default: return '';
         }
     };
@@ -203,16 +207,16 @@ export function CreateVaultScreen() {
     // --- Render based on mode ---
 
     if (mode.type === 'saving') {
-        return <Text color="yellow">Сохранение...</Text>;
+        return <Text color="yellow">{t('create.saving')}</Text>;
     }
 
     if (mode.type === 'error') {
         return (
             <>
-                <Text color="red">Ошибка: {mode.message}</Text>
+                <Text color="red">{t('create.error')}: {mode.message}</Text>
                 <SelectList items={[
-                    {label: 'Повторить', value: 'retry'},
-                    {label: '← Назад (Esc)', value: 'back'},
+                    {label: t('create.retry'), value: 'retry'},
+                    {label: t('create.back'), value: 'back'},
                 ]} onSelect={(item) => {
                     if (item.value === 'retry') save();
                     else pop();
@@ -224,8 +228,8 @@ export function CreateVaultScreen() {
     if (mode.type === 'edit') {
         return (
             <>
-                <Text bold>Создание хранилища</Text>
-                <Text dimColor>Редактирование поля (Escape — отмена)</Text>
+                <Text bold>{t('create.title')}</Text>
+                <Text dimColor>{t('create.editField')}</Text>
                 <TextInput
                     key={inputKey}
                     prompt={fieldPrompt(mode.field)}
@@ -244,11 +248,11 @@ export function CreateVaultScreen() {
     if (mode.type === 'add-extra-key') {
         return (
             <>
-                <Text bold>Создание хранилища</Text>
-                <Text dimColor>Экстра данные — введите ключ (Escape — отмена)</Text>
+                <Text bold>{t('create.title')}</Text>
+                <Text dimColor>{t('create.extraKeyPrompt')}</Text>
                 <TextInput
                     key={inputKey}
-                    prompt="Ключ"
+                    prompt={t('create.key')}
                     onSubmit={(v) => {
                         if (!v) { setMode({type: 'navigate'}); return; }
                         nextInput();
@@ -263,11 +267,11 @@ export function CreateVaultScreen() {
     if (mode.type === 'add-extra-value') {
         return (
             <>
-                <Text bold>Создание хранилища</Text>
-                <Text dimColor>Значение для "{mode.key}" (Escape — отмена)</Text>
+                <Text bold>{t('create.title')}</Text>
+                <Text dimColor>{t('create.extraValuePrompt', {key: mode.key})}</Text>
                 <TextInput
                     key={inputKey}
-                    prompt="Значение"
+                    prompt={t('create.value')}
                     onSubmit={(v) => {
                         setExtraData(prev => ({...prev, [mode.key]: v}));
                         setMode({type: 'navigate'});
@@ -280,15 +284,15 @@ export function CreateVaultScreen() {
 
     if (mode.type === 'select-collection') {
         const collectionItems: SelectListItem[] = [
-            {label: '📁 Корневая коллекция', value: 'root'},
+            {label: t('create.rootCollection'), value: 'root'},
             ...(rootCollection ? collectCollections(rootCollection) : []),
-            {label: '+ Создать новую коллекцию', value: 'new'},
-            {label: '← Отмена (Esc)', value: 'cancel'},
+            {label: t('create.newCollection'), value: 'new'},
+            {label: t('create.cancel'), value: 'cancel'},
         ];
         return (
             <>
-                <Text bold>Создание хранилища</Text>
-                <Text dimColor>Выбор коллекции</Text>
+                <Text bold>{t('create.title')}</Text>
+                <Text dimColor>{t('create.selectCollection')}</Text>
                 <SelectList items={collectionItems} onSelect={(item) => {
                     if (item.value === 'cancel') {
                         setMode({type: 'navigate'});
@@ -311,11 +315,11 @@ export function CreateVaultScreen() {
     if (mode.type === 'new-collection') {
         return (
             <>
-                <Text bold>Создание хранилища</Text>
-                <Text dimColor>Имя новой коллекции (Escape — отмена)</Text>
+                <Text bold>{t('create.title')}</Text>
+                <Text dimColor>{t('create.newCollectionName')}</Text>
                 <TextInput
                     key={inputKey}
-                    prompt="Имя коллекции"
+                    prompt={t('create.collectionName')}
                     onSubmit={async (v) => {
                         if (!v) { setMode({type: 'select-collection'}); return; }
                         try {
@@ -328,7 +332,7 @@ export function CreateVaultScreen() {
                             setSelectedCollection(newCol);
                             setMode({type: 'navigate'});
                         } catch {
-                            showNotification('Ошибка создания коллекции');
+                            showNotification(t('create.collectionError'));
                             setMode({type: 'select-collection'});
                         }
                     }}
@@ -341,12 +345,12 @@ export function CreateVaultScreen() {
     if (mode.type === 'select-algorithm') {
         const items: SelectListItem[] = [
             ...algorithmItems,
-            {label: '← Отмена (Esc)', value: 'cancel'},
+            {label: t('create.cancel'), value: 'cancel'},
         ];
         return (
             <>
-                <Text bold>Создание хранилища</Text>
-                <Text dimColor>Выбор алгоритма шифрования</Text>
+                <Text bold>{t('create.title')}</Text>
+                <Text dimColor>{t('create.selectAlgorithm')}</Text>
                 <SelectList items={items} onSelect={(item) => {
                     if (item.value === 'cancel') {
                         setMode({type: 'navigate'});
@@ -362,7 +366,7 @@ export function CreateVaultScreen() {
     // Default: navigate mode — show the form
     return (
         <>
-            <Text bold>Создание хранилища</Text>
+            <Text bold>{t('create.title')}</Text>
             <Text dimColor>{'─'.repeat(30)}</Text>
             <SelectList items={formItems} onSelect={handleFormSelect} onEscape={pop} />
         </>

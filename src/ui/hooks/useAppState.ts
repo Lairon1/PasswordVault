@@ -9,7 +9,8 @@ export type Screen =
     | { type: 'create-vault' }
     | { type: 'master-password' }
     | { type: 'password-prompt'; vault: Vault; onSuccess: (content: VaultContent) => void }
-    | { type: 'password-generator' };
+    | { type: 'password-generator' }
+    | { type: 'settings' };
 
 interface AppState {
     screenStack: Screen[];

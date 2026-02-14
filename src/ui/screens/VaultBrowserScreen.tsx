@@ -2,6 +2,7 @@ import React, {useCallback, useState} from 'react';
 import {Text} from 'ink';
 import {SelectList, SelectListItem} from '../components/SelectList.js';
 import {useAppState} from '../hooks/useAppState.js';
+import {useLocale} from '../hooks/useLocale.js';
 import {VaultCollection} from '../../dto/vault.dto.js';
 
 interface VaultBrowserScreenProps {
@@ -10,6 +11,7 @@ interface VaultBrowserScreenProps {
 
 export function VaultBrowserScreen({collection}: VaultBrowserScreenProps) {
     const {push, pop, vaultService, masterPassword, showNotification} = useAppState();
+    const {t} = useLocale();
     const [loading, setLoading] = useState(false);
     const [confirmDeleteCollection, setConfirmDeleteCollection] = useState(false);
 
@@ -29,24 +31,24 @@ export function VaultBrowserScreen({collection}: VaultBrowserScreenProps) {
 
     if (!isRoot) {
         items.push({label: '─'.repeat(20), value: '', separator: true});
-        items.push({label: 'Удалить коллекцию', value: 'delete-collection', color: 'red'});
+        items.push({label: t('browser.deleteCollection'), value: 'delete-collection', color: 'red'});
     }
 
     items.push({label: '─'.repeat(20), value: '', separator: true});
-    items.push({label: '← Назад (Esc)', value: 'back'});
+    items.push({label: t('browser.back'), value: 'back'});
 
     const handleDeleteCollection = useCallback(async () => {
         setLoading(true);
         try {
             await vaultService.deleteVaultCollection(collection);
-            showNotification('Коллекция удалена');
+            showNotification(t('browser.collectionDeleted'));
             pop();
         } catch {
-            showNotification('Ошибка удаления коллекции');
+            showNotification(t('browser.deleteError'));
             setLoading(false);
             setConfirmDeleteCollection(false);
         }
-    }, [collection, vaultService, pop, showNotification]);
+    }, [collection, vaultService, pop, showNotification, t]);
 
     const handleSelect = useCallback(async (item: SelectListItem) => {
         if (item.value === 'back') {
@@ -97,20 +99,20 @@ export function VaultBrowserScreen({collection}: VaultBrowserScreenProps) {
     }, [collection, push, pop, vaultService, masterPassword]);
 
     if (loading) {
-        return <Text color="yellow">Загрузка...</Text>;
+        return <Text color="yellow">{t('browser.loading')}</Text>;
     }
 
     if (confirmDeleteCollection) {
         const hasContent = collection.childCollections.length > 0 || collection.vaults.length > 0;
         return (
             <>
-                <Text bold color="red">Удалить коллекцию "{collection.collectionName}"?</Text>
-                {hasContent && <Text color="yellow">Коллекция содержит вложенные элементы, они тоже будут удалены!</Text>}
-                <Text dimColor>Это действие необратимо</Text>
+                <Text bold color="red">{t('browser.confirmDeleteCollection', {name: collection.collectionName})}</Text>
+                {hasContent && <Text color="yellow">{t('browser.hasNestedContent')}</Text>}
+                <Text dimColor>{t('browser.irreversible')}</Text>
                 <SelectList
                     items={[
-                        {label: 'Нет', value: 'no'},
-                        {label: 'Да, удалить', value: 'yes', color: 'red'},
+                        {label: t('browser.no'), value: 'no'},
+                        {label: t('browser.yesDelete'), value: 'yes', color: 'red'},
                     ]}
                     onSelect={(item) => {
                         if (item.value === 'yes') handleDeleteCollection();

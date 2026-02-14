@@ -2,23 +2,25 @@ import React from 'react';
 import {Text} from 'ink';
 import {TextInput} from '../components/TextInput.js';
 import {useAppState} from '../hooks/useAppState.js';
+import {useLocale} from '../hooks/useLocale.js';
 
 export function MasterPasswordScreen() {
     const {pop, setMasterPassword, showNotification} = useAppState();
+    const {t} = useLocale();
 
     return (
         <>
-            <Text bold>Мастер пароль</Text>
+            <Text bold>{t('master.title')}</Text>
             <Text dimColor>{'─'.repeat(30)}</Text>
-            <Text dimColor>Введите мастер пароль для автоматической расшифровки</Text>
-            <Text dimColor>Escape — назад</Text>
+            <Text dimColor>{t('master.description')}</Text>
+            <Text dimColor>{t('master.escapeBack')}</Text>
             <TextInput
-                prompt="Пароль"
+                prompt={t('master.password')}
                 mask
                 onSubmit={(value) => {
                     if (value) {
                         setMasterPassword(value);
-                        showNotification('Мастер пароль установлен');
+                        showNotification(t('master.set'));
                     }
                     pop();
                 }}

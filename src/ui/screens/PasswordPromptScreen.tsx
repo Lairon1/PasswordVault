@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Text} from 'ink';
 import {TextInput} from '../components/TextInput.js';
 import {useAppState} from '../hooks/useAppState.js';
+import {useLocale} from '../hooks/useLocale.js';
 import {Vault, VaultContent} from '../../dto/vault.dto.js';
 
 interface PasswordPromptScreenProps {
@@ -11,6 +12,7 @@ interface PasswordPromptScreenProps {
 
 export function PasswordPromptScreen({vault, onSuccess}: PasswordPromptScreenProps) {
     const {pop, replaceTop, vaultService} = useAppState();
+    const {t} = useLocale();
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [key, setKey] = useState(0);
@@ -23,25 +25,25 @@ export function PasswordPromptScreen({vault, onSuccess}: PasswordPromptScreenPro
             const content = await vaultService.decryptVault(vault, password);
             replaceTop({type: 'vault-detail', vault, content});
         } catch {
-            setError('Неверный пароль. Попробуйте снова.');
+            setError(t('prompt.wrongPassword'));
             setKey(prev => prev + 1);
             setLoading(false);
         }
     };
 
     if (loading) {
-        return <Text color="yellow">Расшифровка...</Text>;
+        return <Text color="yellow">{t('prompt.decrypting')}</Text>;
     }
 
     return (
         <>
-            <Text bold>🔒 Пароль для {vault.name}</Text>
+            <Text bold>{t('prompt.passwordFor', {name: vault.name})}</Text>
             <Text dimColor>{'─'.repeat(30)}</Text>
-            <Text dimColor>Назад — Escape</Text>
+            <Text dimColor>{t('prompt.escapeBack')}</Text>
             {error && <Text color="red">{error}</Text>}
             <TextInput
                 key={key}
-                prompt="Пароль"
+                prompt={t('prompt.password')}
                 mask
                 onSubmit={handleSubmit}
                 onCancel={pop}

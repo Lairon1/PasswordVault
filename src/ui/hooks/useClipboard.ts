@@ -1,9 +1,11 @@
 import {useCallback} from 'react';
 import {execSync} from 'node:child_process';
 import {useAppState} from './useAppState.js';
+import {useLocale} from './useLocale.js';
 
 export function useClipboard() {
     const {showNotification} = useAppState();
+    const {t} = useLocale();
 
     const copyToClipboard = useCallback((text: string) => {
         try {
@@ -15,11 +17,11 @@ export function useClipboard() {
             } else {
                 execSync('xclip -selection clipboard', {input: text});
             }
-            showNotification('Скопировано в буфер обмена');
+            showNotification(t('clipboard.copied'));
         } catch {
-            showNotification('Ошибка копирования в буфер обмена');
+            showNotification(t('clipboard.error'));
         }
-    }, [showNotification]);
+    }, [showNotification, t]);
 
     return {copyToClipboard};
 }

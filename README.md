@@ -12,6 +12,7 @@
 - Мастер-пароль для быстрой расшифровки без повторного ввода
 - Копирование логина, пароля и TOTP-кода в буфер обмена
 - Встроенный генератор паролей с настраиваемой длиной и набором символов
+- Мультиязычность — поддержка русского и английского интерфейса с выбором при первом запуске и переключением в настройках
 - Кроссплатформенность (Windows, macOS, Linux)
 
 ---
@@ -67,15 +68,32 @@ pwd
 
 ## Хранение данных
 
-Зашифрованные файлы хранятся в платформозависимой директории:
+Зашифрованные файлы и конфигурация хранятся в платформозависимой директории:
 
 | Платформа | Путь                                            |
 |-----------|-------------------------------------------------|
-| Windows   | `%APPDATA%\PasswordVault\vault\`                |
-| macOS     | `~/Library/Application Support/PasswordVault/vault/` |
-| Linux     | `~/.config/PasswordVault/vault/`                |
+| Windows   | `%APPDATA%\PasswordVault\`                      |
+| macOS     | `~/Library/Application Support/PasswordVault/`  |
+| Linux     | `~/.config/PasswordVault/`                      |
 
-Каждое хранилище сохраняется как `.crypto` файл в формате JSON с зашифрованным содержимым.
+- Хранилища сохраняются как `.crypto` файлы в подпапке `vault/`
+- Настройки (выбранный язык) сохраняются в `config.json`
+
+---
+
+## Локализация (i18n)
+
+Приложение поддерживает два языка интерфейса:
+
+| Язык     | Код |
+|----------|-----|
+| English  | `en` |
+| Русский  | `ru` |
+
+- При первом запуске отображается экран выбора языка
+- Язык можно переключить в любой момент через **Меню → Настройки**
+- Выбор сохраняется в `config.json` и применяется при следующем запуске
+- Все строки интерфейса вынесены в JSON-файлы (`src/i18n/ru.json`, `src/i18n/en.json`)
 
 ---
 
@@ -99,6 +117,9 @@ pwd
 src/
 ├── index.tsx                   # Точка входа CLI-приложения
 ├── container.ts                # Настройка DI-контейнера (Awilix)
+├── i18n/                       # Файлы локализации
+│   ├── ru.json                 # Русские строки интерфейса
+│   └── en.json                 # Английские строки интерфейса
 ├── dto/                        # Data Transfer Objects
 │   ├── vault.dto.ts            # Vault, VaultCollection, VaultContent
 │   └── algorithm.type.ts       # Enum алгоритмов шифрования
@@ -108,6 +129,9 @@ src/
 ├── service/                    # Сервисный слой
 │   ├── vault.service.ts        # Интерфейс VaultService
 │   ├── crypto-file.service.ts  # Интерфейс CryptoFileService
+│   ├── config.service.ts       # Интерфейс ConfigService (настройки)
+│   ├── locale.service.ts       # Интерфейс LocaleService (i18n)
+│   ├── password-generation.service.ts
 │   └── impl/                   # Реализации сервисов
 ├── strategy/                   # Стратегии шифрования (Strategy Pattern)
 │   ├── сrypto.strategy.ts      # Базовый интерфейс CryptoStrategy
@@ -115,8 +139,8 @@ src/
 ├── ui/                         # Терминальный интерфейс
 │   ├── App.tsx                 # Главный компонент, стек экранов
 │   ├── components/             # SelectList, TextInput, Notification, LeftPanel
-│   ├── hooks/                  # useAppState, useClipboard
-│   └── screens/                # Экраны приложения (7 штук)
+│   ├── hooks/                  # useAppState, useClipboard, useLocale
+│   └── screens/                # Экраны приложения (9 штук)
 └── utils/
     └── app.utils.ts            # Утилиты: пути, TOTP-генерация
 ```

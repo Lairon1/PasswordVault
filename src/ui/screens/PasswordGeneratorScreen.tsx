@@ -2,6 +2,7 @@ import React, {useState, useCallback, useEffect, useRef} from 'react';
 import {Box, Text, useInput} from 'ink';
 import {useAppState} from '../hooks/useAppState.js';
 import {useClipboard} from '../hooks/useClipboard.js';
+import {useLocale} from '../hooks/useLocale.js';
 import {container} from '../../container.js';
 import {PasswordGenerationService} from '../../service/password-generation.service.js';
 
@@ -22,18 +23,20 @@ type MenuItem =
     | { type: 'toggle'; label: string; key: keyof Omit<GeneratorSettings, 'length'> }
     | { type: 'exit'; label: string };
 
-function buildMenuItems(settings: GeneratorSettings): MenuItem[] {
+function buildMenuItems(settings: GeneratorSettings, t: (key: string, params?: Record<string, string | number>) => string): MenuItem[] {
+    const on = t('generator.on');
+    const off = t('generator.off');
     return [
-        {type: 'action', label: 'Скопировать пароль', value: 'copy'},
-        {type: 'action', label: 'Перегенерировать пароль', value: 'regenerate'},
+        {type: 'action', label: t('generator.copy'), value: 'copy'},
+        {type: 'action', label: t('generator.regenerate'), value: 'regenerate'},
         {type: 'separator'},
-        {type: 'length', label: `Длина пароля: ${settings.length}`},
-        {type: 'toggle', label: `Заглавные символы: ${settings.useUpper ? 'вкл' : 'выкл'}`, key: 'useUpper'},
-        {type: 'toggle', label: `Строчные символы: ${settings.useLower ? 'вкл' : 'выкл'}`, key: 'useLower'},
-        {type: 'toggle', label: `Числа: ${settings.useDigits ? 'вкл' : 'выкл'}`, key: 'useDigits'},
-        {type: 'toggle', label: `Специальные символы: ${settings.useSpecial ? 'вкл' : 'выкл'}`, key: 'useSpecial'},
+        {type: 'length', label: `${t('generator.length')}: ${settings.length}`},
+        {type: 'toggle', label: `${t('generator.uppercase')}: ${settings.useUpper ? on : off}`, key: 'useUpper'},
+        {type: 'toggle', label: `${t('generator.lowercase')}: ${settings.useLower ? on : off}`, key: 'useLower'},
+        {type: 'toggle', label: `${t('generator.digits')}: ${settings.useDigits ? on : off}`, key: 'useDigits'},
+        {type: 'toggle', label: `${t('generator.special')}: ${settings.useSpecial ? on : off}`, key: 'useSpecial'},
         {type: 'separator'},
-        {type: 'exit', label: 'Выход (Esc)'},
+        {type: 'exit', label: t('generator.exit')},
     ];
 }
 
@@ -58,6 +61,7 @@ function generate(settings: GeneratorSettings): string {
 export function PasswordGeneratorScreen() {
     const {pop, showNotification} = useAppState();
     const {copyToClipboard} = useClipboard();
+    const {t} = useLocale();
 
     const [settings, setSettings] = useState<GeneratorSettings>({
         length: 30,
@@ -75,7 +79,7 @@ export function PasswordGeneratorScreen() {
     const passwordRef = useRef(password);
     passwordRef.current = password;
 
-    const menuItems = buildMenuItems(settings);
+    const menuItems = buildMenuItems(settings, t);
     const selectableIndices = getSelectableIndices(menuItems);
 
     const regenerate = useCallback((s: GeneratorSettings) => {
@@ -179,7 +183,7 @@ export function PasswordGeneratorScreen() {
 
     return (
         <>
-            <Text bold>Генератор паролей</Text>
+            <Text bold>{t('generator.title')}</Text>
             <Text dimColor>{'─'.repeat(30)}</Text>
             <Box marginBottom={1}>
                 <Text color="cyan" bold>{password}</Text>
@@ -193,7 +197,7 @@ export function PasswordGeneratorScreen() {
                     const isSelected = index === selectedIndex;
                     let label = '';
                     if (item.type === 'length' && editingLength && isSelected) {
-                        label = `Длина пароля: ${lengthInput}█`;
+                        label = `${t('generator.length')}: ${lengthInput}█`;
                     } else if (item.type === 'length') {
                         label = item.label + (isSelected ? '  ◄ ►' : '');
                     } else {

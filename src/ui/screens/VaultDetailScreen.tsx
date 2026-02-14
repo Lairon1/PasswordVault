@@ -3,6 +3,7 @@ import {Text} from 'ink';
 import {SelectList, SelectListItem} from '../components/SelectList.js';
 import {useAppState} from '../hooks/useAppState.js';
 import {useClipboard} from '../hooks/useClipboard.js';
+import {useLocale} from '../hooks/useLocale.js';
 import {Vault, VaultContent} from '../../dto/vault.dto.js';
 import {AppUtils} from '../../utils/app.utils.js';
 
@@ -14,6 +15,7 @@ interface VaultDetailScreenProps {
 export function VaultDetailScreen({vault, content}: VaultDetailScreenProps) {
     const {pop, vaultService, showNotification} = useAppState();
     const {copyToClipboard} = useClipboard();
+    const {t} = useLocale();
     const [totpCode, setTotpCode] = useState<string>('');
     const [totpRemaining, setTotpRemaining] = useState(0);
     const [deleting, setDeleting] = useState(false);
@@ -36,25 +38,25 @@ export function VaultDetailScreen({vault, content}: VaultDetailScreenProps) {
         setDeleting(true);
         try {
             await vaultService.deleteVault(vault);
-            showNotification('Хранилище удалено');
+            showNotification(t('detail.vaultDeleted'));
             pop();
         } catch {
-            showNotification('Ошибка удаления хранилища');
+            showNotification(t('detail.deleteError'));
             setDeleting(false);
             setConfirmDelete(false);
         }
-    }, [vault, vaultService, pop, showNotification]);
+    }, [vault, vaultService, pop, showNotification, t]);
 
     const items: SelectListItem[] = [];
 
     if (content.login) {
-        items.push({label: `Логин: ${content.login}`, value: 'login'});
+        items.push({label: `${t('detail.login')}: ${content.login}`, value: 'login'});
     }
     if (content.password) {
-        items.push({label: 'Пароль: ********', value: 'password'});
+        items.push({label: `${t('detail.password')}: ********`, value: 'password'});
     }
     if (content.totpSecret) {
-        items.push({label: `TOTP: ${totpCode} (${totpRemaining}с)`, value: 'totp'});
+        items.push({label: t('detail.totp', {code: totpCode, remaining: totpRemaining}), value: 'totp'});
     }
 
     if (content.extraData) {
@@ -65,9 +67,9 @@ export function VaultDetailScreen({vault, content}: VaultDetailScreenProps) {
     }
 
     items.push({label: '─'.repeat(20), value: '', separator: true});
-    items.push({label: 'Удалить хранилище', value: 'delete', color: 'red'});
+    items.push({label: t('detail.deleteVault'), value: 'delete', color: 'red'});
     items.push({label: '─'.repeat(20), value: '', separator: true});
-    items.push({label: '← Назад (Esc)', value: 'back'});
+    items.push({label: t('detail.back'), value: 'back'});
 
     const handleSelect = useCallback(async (item: SelectListItem) => {
         switch (item.value) {
@@ -96,18 +98,18 @@ export function VaultDetailScreen({vault, content}: VaultDetailScreenProps) {
     }, [content, totpCode, pop, copyToClipboard]);
 
     if (deleting) {
-        return <Text color="yellow">Удаление...</Text>;
+        return <Text color="yellow">{t('detail.deleting')}</Text>;
     }
 
     if (confirmDelete) {
         return (
             <>
-                <Text bold color="red">Удалить хранилище "{vault.name}"?</Text>
-                <Text dimColor>Это действие необратимо</Text>
+                <Text bold color="red">{t('detail.confirmDelete', {name: vault.name})}</Text>
+                <Text dimColor>{t('detail.irreversible')}</Text>
                 <SelectList
                     items={[
-                        {label: 'Нет', value: 'no'},
-                        {label: 'Да, удалить', value: 'yes', color: 'red'},
+                        {label: t('detail.no'), value: 'no'},
+                        {label: t('detail.yesDelete'), value: 'yes', color: 'red'},
                     ]}
                     onSelect={(item) => {
                         if (item.value === 'yes') handleDelete();

@@ -11,6 +11,7 @@ import {VaultDetailScreen} from './screens/VaultDetailScreen.js';
 import {CreateVaultScreen} from './screens/CreateVaultScreen.js';
 import {MasterPasswordScreen} from './screens/MasterPasswordScreen.js';
 import {PasswordPromptScreen} from './screens/PasswordPromptScreen.js';
+import {PasswordGeneratorScreen} from './screens/PasswordGeneratorScreen.js';
 
 const vaultService = container.resolve<VaultService>('vaultService');
 
@@ -39,6 +40,8 @@ function AppContent() {
                 return <MasterPasswordScreen key={screenKey} />;
             case 'password-prompt':
                 return <PasswordPromptScreen key={screenKey} vault={currentScreen.vault} onSuccess={currentScreen.onSuccess} />;
+            case 'password-generator':
+                return <PasswordGeneratorScreen key={screenKey} />;
         }
     };
 

@@ -5,6 +5,7 @@ import { ChaCha20CryptoStrategy } from './strategy/impl/chacha20.strategy.js';
 import { TwofishCryptoStrategy } from './strategy/impl/twofish.strategy.js';
 import {DefaultCryptoFileService} from "./service/impl/default-crypto-file.service.js";
 import {DefaultVaultService} from "./service/impl/default-vault.service.js";
+import {DefaultPasswordGenerationService} from "./service/impl/default-password-generation.service.js";
 
 const container = createContainer({
     injectionMode: InjectionMode.CLASSIC,
@@ -19,7 +20,8 @@ container.register({
         new TwofishCryptoStrategy(),
     ]),
     cryptoFileService: asClass(DefaultCryptoFileService),
-    vaultService: asClass(DefaultVaultService)
+    vaultService: asClass(DefaultVaultService),
+    passwordGenerationService: asClass(DefaultPasswordGenerationService)
 });
 
 export { container };

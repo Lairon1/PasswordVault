@@ -7,6 +7,7 @@ const menuItems: SelectListItem[] = [
     {label: 'Хранилище', value: 'browse'},
     {label: 'Создать хранилище', value: 'create'},
     {label: 'Ввести мастер пароль', value: 'master'},
+    {label: 'Генерировать пароль', value: 'generate'},
     {label: '─'.repeat(20), value: '', separator: true},
     {label: 'Выход (Esc)', value: 'exit'},
 ];
@@ -35,6 +36,9 @@ export function MainMenuScreen() {
                 break;
             case 'master':
                 push({type: 'master-password'});
+                break;
+            case 'generate':
+                push({type: 'password-generator'});
                 break;
             case 'exit':
                 exit();

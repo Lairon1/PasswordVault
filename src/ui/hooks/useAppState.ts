@@ -8,7 +8,8 @@ export type Screen =
     | { type: 'vault-detail'; vault: Vault; content: VaultContent }
     | { type: 'create-vault' }
     | { type: 'master-password' }
-    | { type: 'password-prompt'; vault: Vault; onSuccess: (content: VaultContent) => void };
+    | { type: 'password-prompt'; vault: Vault; onSuccess: (content: VaultContent) => void }
+    | { type: 'password-generator' };
 
 interface AppState {
     screenStack: Screen[];

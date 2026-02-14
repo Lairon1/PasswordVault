@@ -7,6 +7,7 @@ const menuItems: SelectListItem[] = [
     {label: 'Хранилище', value: 'browse'},
     {label: 'Создать хранилище', value: 'create'},
     {label: 'Ввести мастер пароль', value: 'master'},
+    {label: '─'.repeat(20), value: '', separator: true},
     {label: 'Выход (Esc)', value: 'exit'},
 ];
 

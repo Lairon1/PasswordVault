@@ -92,7 +92,7 @@ export class DefaultVaultService implements VaultService {
             throw new VaultLoadError(this.vaultPath, e instanceof Error ? e : undefined);
         }
         let collection = await this.loadVaultCollection(this.vaultPath);
-        collection.collectionName = "RootCollection";
+        collection.collectionName = "Root Vault";
         return collection;
     }
 

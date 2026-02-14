@@ -20,6 +20,7 @@ export function VaultBrowserScreen({collection}: VaultBrowserScreenProps) {
             label: `📁 ${c.collectionName}`,
             value: `col:${c.collectionName}`,
         })),
+        ...(collection.vaults.length > 0  && collection.childCollections.length > 0 ? [{label: '─'.repeat(20), value: '', separator: true}] : []),
         ...collection.vaults.map(v => ({
             label: `🔑 ${v.name}`,
             value: `vault:${v.name}`,

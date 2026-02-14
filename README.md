@@ -2,167 +2,167 @@
 
 ![img.png](img.png)
 
-**PasswordVault** — консольный менеджер паролей с терминальным интерфейсом, написанный на TypeScript. Приложение позволяет безопасно хранить пароли, логины, TOTP-секреты и произвольные данные в зашифрованных хранилищах (vaults), организованных в иерархические коллекции. Поддерживается выбор из четырёх алгоритмов шифрования: AES-256-GCM, ChaCha20-Poly1305, Twofish-CTR и Blowfish-CBC.
+**PasswordVault** is a terminal-based password manager written in TypeScript. The application allows you to securely store passwords, logins, TOTP secrets, and arbitrary data in encrypted vaults organized into hierarchical collections. Four encryption algorithms are supported: AES-256-GCM, ChaCha20-Poly1305, Twofish-CTR, and Blowfish-CBC.
 
-### Возможности
+### Features
 
-- Создание и управление хранилищами паролей с иерархической структурой коллекций
-- Шифрование каждого хранилища индивидуальным паролем и выбранным алгоритмом
-- Генерация TOTP-кодов (двухфакторная аутентификация) прямо в терминале
-- Мастер-пароль для быстрой расшифровки без повторного ввода
-- Копирование логина, пароля и TOTP-кода в буфер обмена
-- Встроенный генератор паролей с настраиваемой длиной и набором символов
-- Мультиязычность — поддержка русского и английского интерфейса с выбором при первом запуске и переключением в настройках
-- Кроссплатформенность (Windows, macOS, Linux)
+- Create and manage password vaults with hierarchical collection structure
+- Encrypt each vault with an individual password and chosen algorithm
+- Generate TOTP codes (two-factor authentication) directly in the terminal
+- Master password for quick decryption without re-entering credentials
+- Copy login, password, and TOTP code to clipboard
+- Built-in password generator with configurable length and character set
+- Multilingual UI — English and Russian with language selection on first launch and switching in settings
+- Cross-platform (Windows, macOS, Linux)
 
 ---
 
-## Установка
+## Installation
 
-### Требования
+### Requirements
 
-- [Node.js](https://nodejs.org/) версии 18 или выше
-- npm (поставляется вместе с Node.js)
+- [Node.js](https://nodejs.org/) version 18 or higher
+- npm (bundled with Node.js)
 
-### Шаги установки
+### Setup
 
 ```bash
-# 1. Клонируйте репозиторий
+# 1. Clone the repository
 git clone https://github.com/your-username/PasswordVault.git
 cd PasswordVault
 
-# 2. Установите зависимости
+# 2. Install dependencies
 npm install
 
-# 3. Соберите проект
+# 3. Build the project
 npm run build
 
-# 4. Запустите приложение
+# 4. Run the application
 npm start
 ```
 
-### Глобальная установка как CLI-команда
+### Global installation as a CLI command
 
-Чтобы использовать приложение как команду `pwd` из любого места в терминале:
+To use the application as a `pwd` command from anywhere in the terminal:
 
 ```bash
 npm install -g .
 ```
 
-После этого приложение доступно по команде:
+After that, the application is available via:
 
 ```bash
 pwd
 ```
 
-### Доступные скрипты
+### Available scripts
 
-| Команда         | Описание                           |
+| Command         | Description                        |
 |-----------------|------------------------------------|
-| `npm run build` | Компиляция TypeScript в JavaScript |
-| `npm start`     | Запуск скомпилированного приложения |
-| `npm run run`   | Сборка и запуск одной командой     |
-| `npm run dev`   | Режим наблюдения (watch mode)      |
+| `npm run build` | Compile TypeScript to JavaScript   |
+| `npm start`     | Run the compiled application       |
+| `npm run run`   | Build and run in one command       |
+| `npm run dev`   | Watch mode                         |
 
 ---
 
-## Хранение данных
+## Data storage
 
-Зашифрованные файлы и конфигурация хранятся в платформозависимой директории:
+Encrypted files and configuration are stored in a platform-specific directory:
 
-| Платформа | Путь                                            |
-|-----------|-------------------------------------------------|
-| Windows   | `%APPDATA%\PasswordVault\`                      |
-| macOS     | `~/Library/Application Support/PasswordVault/`  |
-| Linux     | `~/.config/PasswordVault/`                      |
+| Platform | Path                                            |
+|----------|-------------------------------------------------|
+| Windows  | `%APPDATA%\PasswordVault\`                      |
+| macOS    | `~/Library/Application Support/PasswordVault/`  |
+| Linux    | `~/.config/PasswordVault/`                      |
 
-- Хранилища сохраняются как `.crypto` файлы в подпапке `vault/`
-- Настройки (выбранный язык) сохраняются в `config.json`
+- Vaults are saved as `.crypto` files in the `vault/` subdirectory
+- Settings (selected language) are saved in `config.json`
 
 ---
 
-## Локализация (i18n)
+## Localization (i18n)
 
-Приложение поддерживает два языка интерфейса:
+The application supports two interface languages:
 
-| Язык     | Код |
-|----------|-----|
+| Language | Code |
+|----------|------|
 | English  | `en` |
-| Русский  | `ru` |
+| Russian  | `ru` |
 
-- При первом запуске отображается экран выбора языка
-- Язык можно переключить в любой момент через **Меню → Настройки**
-- Выбор сохраняется в `config.json` и применяется при следующем запуске
-- Все строки интерфейса вынесены в JSON-файлы (`src/i18n/ru.json`, `src/i18n/en.json`)
+- A language selection screen is shown on first launch
+- Language can be switched at any time via **Menu → Settings**
+- The choice is persisted in `config.json` and applied on next launch
+- All UI strings are stored in JSON files (`src/i18n/ru.json`, `src/i18n/en.json`)
 
 ---
 
-## Архитектура и технологии
+## Architecture and technologies
 
-### Стек технологий
+### Tech stack
 
-| Технология        | Назначение                                  |
+| Technology        | Purpose                                     |
 |-------------------|---------------------------------------------|
-| TypeScript        | Язык разработки со строгой типизацией       |
-| React 19          | Построение компонентов терминального UI      |
-| Ink 6             | React-рендерер для терминала                |
-| Awilix            | Dependency Injection контейнер              |
-| Node.js Crypto    | AES-256-GCM, ChaCha20-Poly1305, Blowfish   |
-| twofish-ts        | Реализация алгоритма Twofish                |
-| Figlet            | ASCII-арт логотип                           |
+| TypeScript        | Strictly typed development language          |
+| React 19          | Terminal UI component framework              |
+| Ink 6             | React renderer for the terminal              |
+| Awilix            | Dependency Injection container               |
+| Node.js Crypto    | AES-256-GCM, ChaCha20-Poly1305, Blowfish    |
+| twofish-ts        | Twofish algorithm implementation             |
+| Figlet            | ASCII art logo                               |
 
-### Структура проекта
+### Project structure
 
 ```
 src/
-├── index.tsx                   # Точка входа CLI-приложения
-├── container.ts                # Настройка DI-контейнера (Awilix)
-├── i18n/                       # Файлы локализации
-│   ├── ru.json                 # Русские строки интерфейса
-│   └── en.json                 # Английские строки интерфейса
+├── index.tsx                   # CLI application entry point
+├── container.ts                # DI container setup (Awilix)
+├── i18n/                       # Localization files
+│   ├── ru.json                 # Russian UI strings
+│   └── en.json                 # English UI strings
 ├── dto/                        # Data Transfer Objects
 │   ├── vault.dto.ts            # Vault, VaultCollection, VaultContent
-│   └── algorithm.type.ts       # Enum алгоритмов шифрования
-├── error/                      # Кастомные ошибки
+│   └── algorithm.type.ts       # Encryption algorithm enum
+├── error/                      # Custom errors
 │   ├── vault.errors.ts
 │   └── crypto-file.errors.ts
-├── service/                    # Сервисный слой
-│   ├── vault.service.ts        # Интерфейс VaultService
-│   ├── crypto-file.service.ts  # Интерфейс CryptoFileService
-│   ├── config.service.ts       # Интерфейс ConfigService (настройки)
-│   ├── locale.service.ts       # Интерфейс LocaleService (i18n)
+├── service/                    # Service layer
+│   ├── vault.service.ts        # VaultService interface
+│   ├── crypto-file.service.ts  # CryptoFileService interface
+│   ├── config.service.ts       # ConfigService interface (settings)
+│   ├── locale.service.ts       # LocaleService interface (i18n)
 │   ├── password-generation.service.ts
-│   └── impl/                   # Реализации сервисов
-├── strategy/                   # Стратегии шифрования (Strategy Pattern)
-│   ├── сrypto.strategy.ts      # Базовый интерфейс CryptoStrategy
+│   └── impl/                   # Service implementations
+├── strategy/                   # Encryption strategies (Strategy Pattern)
+│   ├── сrypto.strategy.ts      # Base CryptoStrategy interface
 │   └── impl/                   # AES, ChaCha20, Twofish, Blowfish
-├── ui/                         # Терминальный интерфейс
-│   ├── App.tsx                 # Главный компонент, стек экранов
+├── ui/                         # Terminal interface
+│   ├── App.tsx                 # Main component, screen stack
 │   ├── components/             # SelectList, TextInput, Notification, LeftPanel
 │   ├── hooks/                  # useAppState, useClipboard, useLocale
-│   └── screens/                # Экраны приложения (9 штук)
+│   └── screens/                # Application screens (9 total)
 └── utils/
-    └── app.utils.ts            # Утилиты: пути, TOTP-генерация
+    └── app.utils.ts            # Utilities: paths, TOTP generation
 ```
 
-### Архитектурные паттерны
+### Architectural patterns
 
-- **Strategy Pattern** — каждый алгоритм шифрования реализует единый интерфейс `CryptoStrategy` с методами `encrypt`/`decrypt`, что позволяет легко добавлять новые алгоритмы
-- **Dependency Injection** — сервисы и стратегии регистрируются в Awilix-контейнере и внедряются через конструктор
-- **Screen Stack Navigation** — навигация между экранами реализована через стек, аналогично мобильным приложениям
+- **Strategy Pattern** — each encryption algorithm implements a unified `CryptoStrategy` interface with `encrypt`/`decrypt` methods, making it easy to add new algorithms
+- **Dependency Injection** — services and strategies are registered in an Awilix container and injected via constructor
+- **Screen Stack Navigation** — screen navigation is implemented via a stack, similar to mobile applications
 
-### Алгоритмы шифрования
+### Encryption algorithms
 
-Все алгоритмы используют **Scrypt** для деривации ключа (N=16384, r=8, p=1), что обеспечивает устойчивость к GPU/ASIC атакам.
+All algorithms use **Scrypt** for key derivation (N=16384, r=8, p=1), providing resistance against GPU/ASIC attacks.
 
-| Алгоритм           | Режим | Аутентификация    | Длина ключа | Nonce/IV  |
-|---------------------|-------|-------------------|-------------|-----------|
-| AES-256-GCM         | GCM   | Встроенная (AEAD) | 256 бит     | 12 байт   |
-| ChaCha20-Poly1305   | AEAD  | Встроенная (AEAD) | 256 бит     | 12 байт   |
-| Twofish-CTR         | CTR   | HMAC-SHA256       | 256 бит     | 16 байт   |
-| Blowfish-CBC        | CBC   | HMAC-SHA256       | 256 бит     | 8 байт    |
+| Algorithm           | Mode | Authentication    | Key length | Nonce/IV  |
+|---------------------|------|-------------------|------------|-----------|
+| AES-256-GCM         | GCM  | Built-in (AEAD)   | 256 bit    | 12 bytes  |
+| ChaCha20-Poly1305   | AEAD | Built-in (AEAD)   | 256 bit    | 12 bytes  |
+| Twofish-CTR         | CTR  | HMAC-SHA256       | 256 bit    | 16 bytes  |
+| Blowfish-CBC        | CBC  | HMAC-SHA256       | 256 bit    | 8 bytes   |
 
-### Формат зашифрованного файла
+### Encrypted file format
 
 ```json
 {
@@ -172,10 +172,10 @@ src/
 }
 ```
 
-Внутри `securedData` закодированы: соль, nonce/IV, тег аутентификации (или HMAC) и шифротекст.
+The `securedData` field contains encoded: salt, nonce/IV, authentication tag (or HMAC), and ciphertext.
 
 ---
 
-## Автор
+## Author
 
 Developed by **0xLairon1**

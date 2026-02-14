@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { makeSession, encrypt as tfEncrypt, decrypt as tfDecrypt } from 'twofish-ts';
-import type { CryptoService } from '../сrypto.strategy.js';
+import type { CryptoStrategy } from '../сrypto.strategy.js';
+import {AlgorithmType} from "../../dto/algorithm.type.js";
 
 const SALT_LEN = 16;
 const KEY_LEN = 32;
@@ -46,7 +47,7 @@ function twofishCtr(key: Uint8Array, nonce: Uint8Array, input: Uint8Array): Uint
     return output;
 }
 
-export class TwofishCryptoService implements CryptoService {
+export class TwofishCryptoStrategy implements CryptoStrategy {
 
     async encrypt(content: string, password: string): Promise<string> {
         const salt = crypto.randomBytes(SALT_LEN);
@@ -89,7 +90,7 @@ export class TwofishCryptoService implements CryptoService {
         return Buffer.from(decrypted).toString('utf8');
     }
 
-    getCryptoAlgorithmName(): string {
-        return 'Twofish-CTR';
+    getCryptoAlgorithmType(): AlgorithmType {
+        return AlgorithmType.TWOFISH_CTR;
     }
 }

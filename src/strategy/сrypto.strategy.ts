@@ -1,4 +1,6 @@
-export interface CryptoService {
+import {AlgorithmType} from "../dto/algorithm.type.js";
+
+export interface CryptoStrategy {
 
     /**
      * Зашифровать данные по паролю.
@@ -21,6 +23,6 @@ export interface CryptoService {
     /**
      * Получить имя алгоритма
      */
-    getCryptoAlgorithmName(): string;
+    getCryptoAlgorithmType(): AlgorithmType;
 
 }

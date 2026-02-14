@@ -1,0 +1,25 @@
+import { createContainer, asClass, asValue, InjectionMode } from 'awilix';
+import { AesCryptoStrategy } from './strategy/impl/aes.strategy.js';
+import { BlowfishCryptoStrategy } from './strategy/impl/blowfish.strategy.js';
+import { ChaCha20CryptoStrategy } from './strategy/impl/chacha20.strategy.js';
+import { TwofishCryptoStrategy } from './strategy/impl/twofish.strategy.js';
+import {DefaultCryptoFileService} from "./service/impl/default-crypto-file.service.js";
+import {DefaultVaultService} from "./service/impl/default-vault.service.js";
+
+const container = createContainer({
+    injectionMode: InjectionMode.CLASSIC,
+    strict: true,
+});
+
+container.register({
+    cryptoStrategies: asValue([
+        new AesCryptoStrategy(),
+        new BlowfishCryptoStrategy(),
+        new ChaCha20CryptoStrategy(),
+        new TwofishCryptoStrategy(),
+    ]),
+    cryptoFileService: asClass(DefaultCryptoFileService),
+    vaultService: asClass(DefaultVaultService)
+});
+
+export { container };

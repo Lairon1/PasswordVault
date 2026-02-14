@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@noble/ciphers": "^2.1.1",
+    "awilix": "^12.1.1",
     "figlet": "^1.10.0",
     "ink": "^6.7.0",
     "react": "^19.2.4",
